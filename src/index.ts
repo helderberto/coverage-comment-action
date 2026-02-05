@@ -2,7 +2,24 @@ import { readFileSync } from 'fs';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-async function run() {
+interface CoverageMetric {
+  pct: number;
+  covered: number;
+  total: number;
+}
+
+interface CoverageSummary {
+  total: {
+    lines: CoverageMetric;
+    statements: CoverageMetric;
+    functions: CoverageMetric;
+    branches: CoverageMetric;
+  };
+}
+
+type MetricType = 'lines' | 'statements' | 'functions' | 'branches';
+
+async function run(): Promise<void> {
   try {
     const token = core.getInput('github-token', { required: true });
     const coverageFile = core.getInput('coverage-file');
@@ -17,11 +34,16 @@ async function run() {
       return;
     }
 
-    const coverage = JSON.parse(readFileSync(coverageFile, 'utf-8'));
-    const { total } = coverage;
-    const metrics = ['lines', 'statements', 'functions', 'branches'];
+    if (!context.payload.pull_request) {
+      core.setFailed('No pull request found in context');
+      return;
+    }
 
-    const formatMetric = (metric) => {
+    const coverage: CoverageSummary = JSON.parse(readFileSync(coverageFile, 'utf-8'));
+    const { total } = coverage;
+    const metrics: MetricType[] = ['lines', 'statements', 'functions', 'branches'];
+
+    const formatMetric = (metric: MetricType): string => {
       const pct = total[metric].pct;
       const icon = pct >= threshold ? '✅' : pct >= threshold - 10 ? '⚠️' : '❌';
       return `${icon} ${pct}%`;
@@ -58,8 +80,8 @@ Branches:   ${total.branches.covered}/${total.branches.total}
 
     const botComment = comments.find(
       (comment) =>
-        comment.user.type === 'Bot' &&
-        comment.body.includes(commentTitle)
+        comment.user?.type === 'Bot' &&
+        comment.body?.includes(commentTitle)
     );
 
     if (botComment) {
@@ -80,7 +102,11 @@ Branches:   ${total.branches.covered}/${total.branches.total}
       core.info('Created new coverage comment');
     }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    } else {
+      core.setFailed('An unknown error occurred');
+    }
   }
 }
 

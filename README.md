@@ -216,13 +216,13 @@ This action uses [@vercel/ncc](https://github.com/vercel/ncc) to bundle dependen
 
 ### Building
 
-After making changes to `src/index.js`, run:
+After making changes to `src/index.ts`, run:
 
 ```bash
 npm run build
 ```
 
-This compiles `src/index.js` and all dependencies into `dist/index.js`. The `dist/` folder is committed to the repository (not `node_modules/`).
+This compiles `src/index.ts` and all dependencies into `dist/index.js`. The `dist/` folder is committed to the repository (not `node_modules/`).
 
 ### Why Bundle?
 

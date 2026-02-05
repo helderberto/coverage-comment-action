@@ -10,7 +10,17 @@ GitHub Action to automatically post test coverage reports as pull request commen
 - 📈 Expandable detailed coverage breakdown
 - ⚙️ Configurable threshold and file path
 
-## Usage
+## Installation
+
+Add this action to your workflow file (e.g., `.github/workflows/ci.yml`):
+
+```yaml
+- uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## Quick Start
 
 ```yaml
 name: CI
@@ -48,14 +58,66 @@ jobs:
           threshold: 90
 ```
 
-## Inputs
+## Configuration
+
+### Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `github-token` | GitHub token for authentication | Yes | - |
+| `github-token` | GitHub token for authentication | ✅ Yes | - |
 | `coverage-file` | Path to coverage-summary.json | No | `./coverage/coverage-summary.json` |
 | `threshold` | Minimum coverage threshold (%) | No | `90` |
 | `comment-title` | Title for the PR comment | No | `📊 Coverage Report` |
+
+### Examples
+
+**Basic usage (defaults):**
+```yaml
+- uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Custom coverage file path:**
+```yaml
+- uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    coverage-file: ./packages/my-package/coverage/coverage-summary.json
+```
+
+**Custom threshold (80%):**
+```yaml
+- uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    threshold: 80
+```
+
+**Custom comment title:**
+```yaml
+- uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    comment-title: '🧪 Test Coverage Results'
+```
+
+**Monorepo with multiple packages:**
+```yaml
+- name: Coverage for package A
+  uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    coverage-file: ./packages/package-a/coverage/coverage-summary.json
+    comment-title: '📊 Package A Coverage'
+
+- name: Coverage for package B
+  uses: helderberto/coverage-comment-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    coverage-file: ./packages/package-b/coverage/coverage-summary.json
+    comment-title: '📊 Package B Coverage'
+```
 
 ## Requirements
 
@@ -82,9 +144,10 @@ Most coverage tools (Jest, Vitest, NYC) generate this format automatically when 
 
 ## Example Output
 
-The action posts a comment like this:
+The action posts a comment on your PR that looks like this:
 
-```markdown
+---
+
 ## 📊 Coverage Report
 
 | Metric | Coverage |
@@ -95,6 +158,56 @@ The action posts a comment like this:
 | Branches | ⚠️ 92.3% |
 
 **Thresholds:** 90% minimum required
+
+---
+<details>
+<summary>📈 Coverage Details</summary>
+
+```
+Lines:      191/200
+Statements: 191/200
+Functions:  50/50
+Branches:   48/52
+```
+</details>
+
+---
+
+### Icon Legend
+
+- ✅ **Green checkmark**: Coverage meets or exceeds threshold
+- ⚠️ **Warning**: Coverage is within 10% below threshold
+- ❌ **Red X**: Coverage is more than 10% below threshold
+
+## Working with Different Test Runners
+
+### Vitest
+
+```json
+{
+  "test": {
+    "coverage": {
+      "provider": "v8",
+      "reporter": ["text", "json-summary"]
+    }
+  }
+}
+```
+
+### Jest
+
+```json
+{
+  "coverageReporters": ["text", "json-summary"]
+}
+```
+
+### NYC (Istanbul)
+
+```json
+{
+  "reporter": ["text", "json-summary"]
+}
 ```
 
 ## License

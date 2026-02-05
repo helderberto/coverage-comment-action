@@ -1,0 +1,28 @@
+name: 'Coverage Comment'
+description: 'Post test coverage reports as PR comments with configurable thresholds'
+author: 'Helder Burato Berto'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  github-token:
+    description: 'GitHub token for authentication'
+    required: true
+  coverage-file:
+    description: 'Path to coverage-summary.json file'
+    required: false
+    default: './coverage/coverage-summary.json'
+  threshold:
+    description: 'Minimum coverage threshold percentage'
+    required: false
+    default: '90'
+  comment-title:
+    description: 'Title for the PR comment'
+    required: false
+    default: '📊 Coverage Report'
+
+runs:
+  using: 'node20'
+  main: 'src/index.js'

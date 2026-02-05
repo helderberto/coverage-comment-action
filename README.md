@@ -230,8 +230,6 @@ This compiles `src/index.js` and all dependencies into `dist/index.js`. The `dis
 - **Faster action execution** - no `npm install` needed
 - **Smaller repository** - commit bundled code, not `node_modules/`
 
-This follows the same pattern as official GitHub actions like [actions/labeler](https://github.com/actions/labeler).
-
 ## License
 
 MIT
